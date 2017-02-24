@@ -1,0 +1,75 @@
+---
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+
+Description: >
+  Deploys the infinite logger container in an ECS cluster
+
+Parameters:
+
+  ArtifactsS3Bucket:
+    Type: String
+    Description: >
+      REQUIRED - Specifies the name of the S3 bucket that contains various
+      artifacts, e.g. lambda builds and cloudformation scripts.
+
+  AvailabilityZone1:
+    Type: AWS::EC2::AvailabilityZone::Name
+
+  AvailabilityZone2:
+    Type: AWS::EC2::AvailabilityZone::Name
+
+  AvailabilityZone3:
+    Type: AWS::EC2::AvailabilityZone::Name
+
+  KeyName:
+    Description: The name of the key pair used to SSH into the box, pass an empty string for no SSH access.
+    Type: String
+
+Resources:
+
+  EcsClusterStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Join [ "", [ "https://s3.amazonaws.com/", !Ref ArtifactsS3Bucket, "/cloudformation/ecs-cluster.yml" ] ]
+      Parameters:
+        ArtifactsS3Bucket: !Ref ArtifactsS3Bucket
+        AvailabilityZone1: !Ref AvailabilityZone1
+        AvailabilityZone2: !Ref AvailabilityZone2
+        AvailabilityZone3: !Ref AvailabilityZone3
+        ClusterDesiredCapacity: 1
+        ClusterMaxSize: 2
+        KeyName: !Ref KeyName
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      RetentionInDays: 7
+
+  TaskDefinitionInfiniteLogger:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: InfiniteLogger
+      ContainerDefinitions:
+        -
+          Name: infinite-logger
+          Hostname: infinite-logger
+          Image: cpliakas/infinite-logger:latest
+          Memory: 64
+          Essential: true
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+
+  ServiceInfiniteLogger:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !GetAtt EcsClusterStack.Outputs.Cluster
+      DesiredCount: 1
+      DeploymentConfiguration:
+        MaximumPercent: 100
+        MinimumHealthyPercent: 0
+      TaskDefinition: !Ref TaskDefinitionInfiniteLogger

@@ -25,6 +25,12 @@ Assuming a working [Docker installation](https://docs.docker.com/engine/installa
 docker run cpliakas/infinite-logger
 ```
 
+### AWS Elastic Container Service
+
+TODO: Need some more docs
+
+This project extends https://github.com/cpliakas/ecs-cluster
+
 ## Building the Docker Image
 
 Basically this is copy-pasta for me ...
