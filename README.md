@@ -6,17 +6,35 @@ A stoopid-simple app that logs a message every 5 seconds.
 
 Sometimes you want a really light-weight binary to test deployments.
 
-## Docker build
+## Installation
+
+### Native Binary
 
 Assuming a [correctly configured](https://golang.org/doc/install#testing)
 Go toolchain:
 
 ```
+go get github.com/cpliakas/infinite-logger
+```
+
+### Docker Image
+
+Assuming a working [Docker installation](https://docs.docker.com/engine/installation/):
+
+```
+docker run cpliakas/infinite-logger
+```
+
+## Build the Docker Image
+
+Basically this is copy-pasta for me ...
+
+```
 GOOS=linux go build .
+docker build -t cpliakas/infinite-logger .
 ```
 
 Assuming a working [Docker installation](https://docs.docker.com/engine/installation/):
 
 ```
-docker build -t cpliakas/infinite-logger .
 ```
