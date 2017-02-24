@@ -25,16 +25,11 @@ Assuming a working [Docker installation](https://docs.docker.com/engine/installa
 docker run cpliakas/infinite-logger
 ```
 
-## Build the Docker Image
+## Building the Docker Image
 
 Basically this is copy-pasta for me ...
 
 ```
 GOOS=linux go build .
 docker build -t cpliakas/infinite-logger .
-```
-
-Assuming a working [Docker installation](https://docs.docker.com/engine/installation/):
-
-```
 ```
